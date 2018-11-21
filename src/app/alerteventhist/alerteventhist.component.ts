@@ -10,6 +10,7 @@ import { BlockUIService } from '../common/blockui/blockui-service';
 
 import { GenericModal } from '../common/custom-modal/generic-modal';
 import { Observable } from 'rxjs/Rx';
+import { Subscription } from 'rxjs';
 
 import { TableListComponent } from '../common/table-list.component';
 import { AlertEventHistComponentConfig, TableRole, OverrideRoleActions } from './alerteventhist.data';
@@ -54,6 +55,8 @@ export class AlertEventHistComponent implements OnInit {
   private builder;
   private oldID : string;
 
+  public mySubscription: Subscription;
+
   ngOnInit() {
     this.editmode = 'list';
     this.reloadData();
@@ -78,26 +81,27 @@ export class AlertEventHistComponent implements OnInit {
 
   reloadData(action? : any) {
     var timeStart = new Date().getTime();
-    this.blocker.start(this.container, "Loading data. Please wait...");
+    //this.blocker.start(this.container, "Loading data. Please wait...");
     this.isRequesting = true;
-    this.alertEventHistService.getAlertEventHistWithParams(action)
+    this.mySubscription = this.alertEventHistService.getAlertEventHistWithParams(action)
       .subscribe(
       data => {
         var timeSpent = new Date().getTime() - timeStart;
         console.log("reloadData.getAlertEventHistWithParams timeSpent (ms):" + timeSpent);
-        this.blocker.stop();
+        //this.blocker.stop();
         this.isRequesting = false;
-        this.componentList = data;
-        this.data = data;
+        this.componentList = data.items;
+        this.data = data.items;
         this.setCounters();
+        this.counterTotal = data.total;
         this.editmode = "list";
       },
       err => {
-        this.blocker.stop();
+        //this.blocker.stop();
         console.error(err);
       },
       () => {
-        this.blocker.stop();
+        //this.blocker.stop();
         console.log('DONE');
       }
       );
@@ -240,4 +244,8 @@ export class AlertEventHistComponent implements OnInit {
     return myarray;
   }
 
+  ngOnDestroy() {
+    //if (this.mySubscription) 
+    this.mySubscription.unsubscribe();
+  }
 }

@@ -84,9 +84,10 @@ export class AlertEventComponent implements OnInit {
       data => {
         this.blocker.stop();
         this.isRequesting = false;
-        this.componentList = data;
-        this.data = data;
+        this.componentList = data.items;
+        this.data = data.items;
         this.setCounters();
+        this.counterTotal = data.total;
         this.editmode = "list";
       },
       err => {

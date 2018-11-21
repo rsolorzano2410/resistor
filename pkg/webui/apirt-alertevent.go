@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/toni-moreno/resistor/pkg/agent"
+	"github.com/toni-moreno/resistor/pkg/config"
 	"gopkg.in/macaron.v1"
 )
 
@@ -25,6 +26,12 @@ func NewAPIRtAlertEvent(m *macaron.Macaron) error {
 	})
 
 	return nil
+}
+
+//AlertEventInfo structure with the list and the total number of alert events
+type AlertEventInfo struct {
+	Alevts []*config.AlertEvent `json:"items"`
+	Total  int64                `json:"total"`
 }
 
 // GetAlertEventWithParams Returns Alert Events list to frontend
@@ -53,13 +60,14 @@ func GetAlertEventWithParams(ctx *Context) {
 			sortDir = paramkvarray[1]
 		}
 	}
-	alevtarray, err := agent.MainConfig.Database.GetAlertEventArrayWithParams(filter, page, itemsPerPage, maxSize, sortColumn, sortDir)
+	alevtarray, total, err := agent.MainConfig.Database.GetAlertEventArrayWithParams(filter, page, itemsPerPage, maxSize, sortColumn, sortDir)
 	if err != nil {
 		ctx.JSON(404, err.Error())
 		log.Errorf("Error getting AlertEvent:%+s", err)
 		return
 	}
-	ctx.JSON(200, &alevtarray)
+	alevtinfo := AlertEventInfo{alevtarray, total}
+	ctx.JSON(200, &alevtinfo)
 }
 
 // GetAlertEvent Returns Alert Events list to frontend

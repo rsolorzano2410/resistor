@@ -9,6 +9,8 @@ export const AlertComponentConfig: any =
       { 'title': 'AlertGroup', 'name': 'AlertGroup' },
       { 'title': 'NumAlertID', 'name': 'NumAlertID' },
       { 'title': 'InfluxDB', 'name': 'InfluxDB' },
+      { 'title': 'IfxServer', 'name': 'IfxServer' },
+      { 'title': 'InfluxDBName', 'name': 'InfluxDBName' },
       { 'title': 'InfluxRP', 'name': 'InfluxRP' },
       { 'title': 'InfluxMeasurement', 'name': 'InfluxMeasurement' },
       { 'title': 'InfluxFilter', 'name': 'InfluxFilter' },

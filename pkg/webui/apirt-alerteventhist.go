@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/toni-moreno/resistor/pkg/agent"
+	"github.com/toni-moreno/resistor/pkg/config"
 	"gopkg.in/macaron.v1"
 )
 
@@ -25,6 +26,12 @@ func NewAPIRtAlertEventHist(m *macaron.Macaron) error {
 	})
 
 	return nil
+}
+
+//AlertEventHistInfo structure with the list and the total number of alert events in history table
+type AlertEventHistInfo struct {
+	Alevts []*config.AlertEventHist `json:"items"`
+	Total  int64                    `json:"total"`
 }
 
 // GetAlertEventHistWithParams Returns Alert Events list to frontend
@@ -53,13 +60,14 @@ func GetAlertEventHistWithParams(ctx *Context) {
 			sortDir = paramkvarray[1]
 		}
 	}
-	alevtarray, err := agent.MainConfig.Database.GetAlertEventHistArrayWithParams(filter, page, itemsPerPage, maxSize, sortColumn, sortDir)
+	alevtarray, total, err := agent.MainConfig.Database.GetAlertEventHistArrayWithParams(filter, page, itemsPerPage, maxSize, sortColumn, sortDir)
 	if err != nil {
 		ctx.JSON(404, err.Error())
 		log.Errorf("Error getting AlertEventHist:%+s", err)
 		return
 	}
-	ctx.JSON(200, &alevtarray)
+	alevtinfo := AlertEventHistInfo{alevtarray, total}
+	ctx.JSON(200, &alevtinfo)
 }
 
 // GetAlertEventHist Returns Alert Events list to frontend

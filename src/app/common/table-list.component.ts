@@ -28,7 +28,7 @@ declare var _: any;
       <!--Filtering section-->
       <label [tooltip]="'Clear Filter'" container="body" (click)="onResetFilter()" style="margin-top: 10px"><i class="glyphicon glyphicon-trash text-primary"></i></label>
       <input *ngIf="config.filtering" placeholder="Filter all columns" required = "false" [(ngModel)]="myFilterValue" [ngTableFiltering]="config.filtering" class="form-control select-pages" (tableChanged)="onChangeTable(config)" />
-      <span [ngClass]="length > 0 ? ['label label-info'] : ['label label-warning']" style="font-size : 100%">{{length}} Results</span>
+      <span [ngClass]="length > 0 ? ['label label-info'] : ['label label-warning']" style="font-size : 100%">{{counterTotal}} Results</span>
       <!--Table Actions-->
       <ng-container *ngIf="typeComponent === 'alerteventhist-component' || typeComponent === 'alertevent-component' || typeComponent === 'kapacitortasks-component'">
         <button style ="margin-top: -5px;" type="button" title="Refresh" (click)="customClick('reloaddata')" class="btn btn-primary"><i class="glyphicon glyphicon-refresh"></i></button>
@@ -78,7 +78,7 @@ declare var _: any;
     </ng-table>
 
     <!-- Pagination -->
-    <pagination *ngIf="config.paging" class="pagination-sm" [ngModel]="page" [totalItems]="length" [itemsPerPage]="itemsPerPage" [maxSize]="maxSize" [boundaryLinks]="true" [rotate]="false" (pageChanged)="onChangeTable(config, $event)" (numPages)="numPages = $event">
+    <pagination *ngIf="config.paging" class="pagination-sm" [ngModel]="page" [totalItems]="counterTotal" [itemsPerPage]="itemsPerPage" [maxSize]="maxSize" [boundaryLinks]="true" [rotate]="false" (pageChanged)="onChangeTable(config, $event)" (numPages)="numPages = $event">
     </pagination>
     <pre *ngIf="config.paging" class="card card-block card-header">Page: {{page}} / {{numPages}}</pre>
     `,
@@ -169,11 +169,11 @@ export class TableListComponent implements OnInit, OnChanges {
   public changePage(page: any, data: Array<any> = this.data): Array<any> {
     //Check if we have to change the actual page
 
-    let maxPage = Math.ceil(data.length / this.itemsPerPage);
+    let maxPage = Math.ceil(this.counterTotal / this.itemsPerPage);
     if (page.page > maxPage && page.page != this.page) this.page = page.page = maxPage;
     if (page.page != this.page) this.page = page.page;
     let start = (page.page - 1) * page.itemsPerPage;
-    let end = page.itemsPerPage > -1 ? (start + page.itemsPerPage) : data.length;
+    let end = page.itemsPerPage > -1 ? (start + page.itemsPerPage) : this.counterTotal;
     return data.slice(start, end);
   }
 
@@ -270,7 +270,9 @@ export class TableListComponent implements OnInit, OnChanges {
     let sortedData = this.changeSort(filteredData, this.config);
     this.rows = page && config.paging ? this.changePage(page, sortedData) : sortedData;
     this.length = sortedData.length;
-    let maxPage = Math.ceil(this.length / this.itemsPerPage);
+    //let maxPage = Math.ceil(this.length / this.itemsPerPage);
+    let maxPage = Math.ceil(this.counterTotal / this.itemsPerPage);
+    console.log("onChangeTable. maxPage: " + maxPage + ".this.counterTotal: " + this.counterTotal + ". this.itemsPerPage: " + this.itemsPerPage);
     this.numPagesShown = maxPage < this.maxSize ? maxPage : this.maxSize;
     this.firstPageShown = ((Math.ceil(this.page / this.maxSize) - 1) * this.numPagesShown) + 1;
     this.lastPageShown = (this.firstPageShown + this.numPagesShown - 1) < maxPage ? (this.firstPageShown + this.numPagesShown - 1) : maxPage;
@@ -349,9 +351,9 @@ export class TableListComponent implements OnInit, OnChanges {
       //console.log("customClick with reloaddata");
       this.LastUpdate = new Date();
     }
-    this.customClicked.emit({ 'option': clicked, 'event': event, 'data': data, 'sortColumn': this.sortColumn, 'sortDir': this.sortDir });
+    //this.customClicked.emit({ 'option': clicked, 'event': event, 'data': data, 'sortColumn': this.sortColumn, 'sortDir': this.sortDir });
     //pending change for future, to get only the list of results to show, not all the list
-    //this.customClicked.emit({ 'option': clicked, 'event': event, 'data': data, 'sortColumn': this.sortColumn, 'sortDir': this.sortDir, 'page': this.page, 'itemsPerPage': this.itemsPerPage, 'maxSize': this.maxSize });
+    this.customClicked.emit({ 'option': clicked, 'event': event, 'data': data, 'sortColumn': this.sortColumn, 'sortDir': this.sortDir, 'page': this.page, 'itemsPerPage': this.itemsPerPage, 'maxSize': this.maxSize });
   }
 
 }

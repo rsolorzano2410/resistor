@@ -9,6 +9,7 @@ import { ExportFileModal } from '../common/dataservice/export-file-modal';
 
 import { GenericModal } from '../common/custom-modal/generic-modal';
 import { Observable } from 'rxjs/Rx';
+import { Subscription } from 'rxjs';
 
 import { TableListComponent } from '../common/table-list.component';
 import { TemplateComponentConfig, TableRole, OverrideRoleActions } from './template.data';
@@ -45,6 +46,8 @@ export class TemplateComponent implements OnInit {
 
   private builder;
   private oldID : string;
+
+  public mySubscription: Subscription;
 
   ngOnInit() {
     this.editmode = 'list';
@@ -114,17 +117,22 @@ export class TemplateComponent implements OnInit {
   }
 
   reloadData() {
-    // now it's a simple subscription to the observable
-  this.templateService.getTemplateItem(null)
+    this.isRequesting = true;
+    this.mySubscription = this.templateService.getTemplateItem(null)
       .subscribe(
       data => {
+        //this.mySubscription = null;
         this.isRequesting = false;
-        this.componentList = data
+        this.componentList = data;
         this.data = data;
         this.editmode = "list";
       },
-      err => console.error(err),
-      () => console.log('DONE')
+      err => {
+        console.error(err);
+      },
+      () => {
+        console.log('DONE');
+      }
       );
   }
 
@@ -343,4 +351,10 @@ export class TemplateComponent implements OnInit {
     return myarray;
   }
 
+  ngOnDestroy() {
+    console.log("zzz entering ngOnDestroy");
+    //if (this.mySubscription) 
+    this.mySubscription.unsubscribe();
+    console.log("zzz exiting ngOnDestroy");
+  }
 }

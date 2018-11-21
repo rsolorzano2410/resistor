@@ -115,6 +115,8 @@ export class AlertComponent implements OnInit {
       NumAlertID: [this.sampleComponentForm ? this.sampleComponentForm.value.NumAlertID : '', Validators.compose([Validators.required, ValidationService.uintegerNotZeroValidator])],
       TriggerType: [this.sampleComponentForm ? this.sampleComponentForm.value.TriggerType : 'THRESHOLD', Validators.required],
       InfluxDB: [this.sampleComponentForm ? this.sampleComponentForm.value.InfluxDB : null, Validators.required],
+      InfluxDBName: [this.sampleComponentForm ? this.sampleComponentForm.value.InfluxDBName : null],
+      IfxServer: [this.sampleComponentForm ? this.sampleComponentForm.value.IfxServer : null],
       InfluxRP: [this.sampleComponentForm ? this.sampleComponentForm.value.InfluxRP : null, Validators.required],
       InfluxMeasurement: [this.sampleComponentForm ? this.sampleComponentForm.value.InfluxMeasurement : null, Validators.required],
       InfluxFilter: [this.sampleComponentForm ? this.sampleComponentForm.value.InfluxFilter : ''],
@@ -240,12 +242,13 @@ export class AlertComponent implements OnInit {
   reloadData() {
     //this.blocker.start(this.container, "Loading data. Please wait...");
     this.isRequesting = true;
-    this.alertService.getAlertItem(null)
+    this.mySubscription = this.alertService.getAlertItem(null)
       .subscribe(
       data => {
         //this.blocker.stop();
+        //this.mySubscription = null;
         this.isRequesting = false;
-        this.componentList = data
+        this.componentList = data;
         this.data = data;
         this.editmode = "list";
       },
@@ -486,7 +489,7 @@ export class AlertComponent implements OnInit {
     this.mySubscription = this.productService.getProductItem(null)
       .subscribe(
       data => {
-        this.mySubscription = null;
+        //this.mySubscription = null;
         this.product_list = data;
         this.select_product = [];
         this.select_product = this.createMultiselectArray(data, 'ID','ID');
@@ -501,7 +504,7 @@ export class AlertComponent implements OnInit {
     this.mySubscription = this.rangetimeService.getRangeTimeItem(null)
       .subscribe(
       data => {
-        this.mySubscription = null;
+        //this.mySubscription = null;
         this.select_rangetime = [];
         this.select_rangetime = this.createMultiselectArray(data, 'ID','ID');
       },
@@ -514,7 +517,7 @@ export class AlertComponent implements OnInit {
     this.mySubscription = this.endpointService.getEndpointItem(null)
       .subscribe(
       data => {
-        this.mySubscription = null;
+        //this.mySubscription = null;
         this.select_endpoint = [];
         this.select_endpoint = this.createMultiselectArray(data, 'ID','ID');
       },
@@ -526,7 +529,7 @@ export class AlertComponent implements OnInit {
     this.mySubscription = this.kapacitorService.getKapacitorItem(null)
       .subscribe(
       data => {
-        this.mySubscription = null;
+        //this.mySubscription = null;
         this.select_kapacitor = [];
         this.select_kapacitor = this.createMultiselectArray(data, 'ID','ID');
       },
@@ -539,7 +542,7 @@ export class AlertComponent implements OnInit {
     this.mySubscription = this.operationService.getOperationItem(null)
       .subscribe(
       data => {
-        this.mySubscription = null;
+        //this.mySubscription = null;
         this.select_operation = [];
         this.select_operation = this.createMultiselectArray(data, 'ID','ID');
       },
@@ -552,7 +555,7 @@ export class AlertComponent implements OnInit {
     this.mySubscription = this.ifxDBService.getIfxDBItem(null)
       .subscribe(
       data => {
-        this.mySubscription = null;
+        //this.mySubscription = null;
         this.ifxdb_list = data;
         this.select_ifxdb = [];
         this.select_ifxdb = this.createMultiselectArray(data, 'ID','Name','IfxServer');
@@ -575,13 +578,15 @@ export class AlertComponent implements OnInit {
     this.picked_ifxdb = this.ifxdb_list.filter((x) => x['ID'] === ifxdb_picked)[0];
 
     if(this.picked_ifxdb) {
+      this.sampleComponentForm.controls.InfluxDBName.setValue(this.picked_ifxdb['Name']);
+      this.sampleComponentForm.controls.IfxServer.setValue(this.picked_ifxdb['IfxServer']);
       this.select_ifxrp = this.createMultiselectArray(this.picked_ifxdb['Retention']);
       this.select_ifxfs = [];
       this.select_ifxts = [];
       this.mySubscription = this.ifxMeasurementService.getIfxMeasurementItemByDbIdMeasName(ifxdb_picked, this.picked_ifxms)
       .subscribe(
         data => {
-          this.mySubscription = null;
+          //this.mySubscription = null;
           this.select_ifxfs = this.createMultiselectArray(data.Fields);
           this.select_ifxts = this.createMultiselectArray(data.Tags);
         },
@@ -606,7 +611,7 @@ export class AlertComponent implements OnInit {
       this.mySubscription = this.ifxDBService.getIfxDBCfgArrayByMeasName(ifxms_picked)
       .subscribe(
         data => {
-          this.mySubscription = null;
+          //this.mySubscription = null;
           console.log(data);
           this.ifxdb_list = data;
           this.select_ifxdb = [];

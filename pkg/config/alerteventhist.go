@@ -69,7 +69,7 @@ func (dbc *DatabaseCfg) GetAlertEventsHistByLevelArray(filter string) ([]*AlertE
 }
 
 /*GetAlertEventHistArrayWithParams generate an array of Alert Events History with all their information */
-func (dbc *DatabaseCfg) GetAlertEventHistArrayWithParams(filter string, page int64, itemsPerPage int64, maxSize int64, sortColumn string, sortDir string) ([]*AlertEventHist, error) {
+func (dbc *DatabaseCfg) GetAlertEventHistArrayWithParams(filter string, page int64, itemsPerPage int64, maxSize int64, sortColumn string, sortDir string) ([]*AlertEventHist, int64, error) {
 	log.Debugf("Getting AlertEventHist data filtered with filter: %s, page: %d, itemsPerPage: %d, maxSize: %d, sortColumn: %s, sortDir: %s", filter, page, itemsPerPage, maxSize, sortColumn, sortDir)
 	var err error
 	var alevts []*AlertEventHist
@@ -81,7 +81,20 @@ func (dbc *DatabaseCfg) GetAlertEventHistArrayWithParams(filter string, page int
 		LIMIT itemsPerPage * maxSize
 		OFFSET itemsPerPage * (page - 1)
 	*/
-	sqlquery := "SELECT * FROM alert_event_hist"
+
+	// Get total number of items
+	sqlquery := "SELECT count(*) FROM alert_event_hist"
+	if len(filter) > 0 {
+		sqlquery = sqlquery + " WHERE " + filter
+	}
+	count, err := dbc.x.SQL(sqlquery).Count(&alevts)
+	if err != nil {
+		log.Warnf("Error getting total number of Alert Events History filtered with sqlquery: %s. Error : %s", sqlquery, err)
+		return nil, -1, err
+	}
+
+	// Get list of items
+	sqlquery = "SELECT * FROM alert_event_hist"
 	if len(filter) > 0 {
 		sqlquery = sqlquery + " WHERE " + filter
 	}
@@ -105,11 +118,11 @@ func (dbc *DatabaseCfg) GetAlertEventHistArrayWithParams(filter string, page int
 	start := time.Now()
 	if err = dbc.x.SQL(sqlquery).Find(&alevts); err != nil {
 		log.Warnf("Fail to get AlertEventHist data filtered with sqlquery: %s. Error : %s", sqlquery, err)
-		return nil, err
+		return nil, -1, err
 	}
 	elapsed := time.Since(start)
 	log.Debugf("TIMELOG: GetAlertEventHistArrayWithParams took %v", elapsed)
-	return alevts, nil
+	return alevts, count, nil
 }
 
 /*AddAlertEventHist for adding new Alert Event History*/

@@ -132,6 +132,22 @@
               <control-messages [control]="sampleComponentForm.controls.InfluxDB"></control-messages>
             </div>
           </div>
+          <div class="form-group" *ngIf="sampleComponentForm.controls.IfxServer && sampleComponentForm.value.InfluxMeasurement">
+            <label class="control-label col-sm-2" for="IfxServer">Influx Server</label>
+            <i placement="top" style="float: left" class="info control-label glyphicon glyphicon-info-sign" tooltipAnimation="true" tooltip="Influx Server"></i>
+            <div class="col-sm-9">
+              <input *ngIf="ifxdb_list && select_ifxdb.length > 0" formControlName="IfxServer" [ngModel]="sampleComponentForm.value.IfxServer" readonly style="border:0px;" />
+              <control-messages [control]="sampleComponentForm.controls.IfxServer"></control-messages>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="sampleComponentForm.controls.InfluxDBName && sampleComponentForm.value.InfluxMeasurement">
+            <label class="control-label col-sm-2" for="InfluxDBName">Influx Database Name</label>
+            <i placement="top" style="float: left" class="info control-label glyphicon glyphicon-info-sign" tooltipAnimation="true" tooltip="Influx Database Name"></i>
+            <div class="col-sm-9">
+              <input *ngIf="ifxdb_list && select_ifxdb.length > 0" formControlName="InfluxDBName" [ngModel]="sampleComponentForm.value.InfluxDBName" readonly style="border:0px;" />
+              <control-messages [control]="sampleComponentForm.controls.InfluxDBName"></control-messages>
+            </div>
+          </div>
           <div class="form-group" *ngIf="sampleComponentForm.controls.InfluxRP && sampleComponentForm.value.InfluxDB">
             <label class="control-label col-sm-2" for="InfluxRP">Influx Retention</label>
             <i placement="top" style="float: left" class="info control-label glyphicon glyphicon-info-sign" tooltipAnimation="true" tooltip="Retention policy of Influx Database"></i>
@@ -211,7 +227,7 @@
           </div>
           <div class="form-group" *ngIf="sampleComponentForm.controls.AlertNotify">
             <label class="control-label col-sm-2" for="AlertNotify">Resend alert on </label>
-            <i placement="top" style="float: left" class="info control-label glyphicon glyphicon-info-sign" tooltipAnimation="true" tooltip="Number of cycles of AlertFrequency to force an alert is sent to endpoint. 0 if you don't want to force."></i>
+            <i placement="top" style="float: left" class="info control-label glyphicon glyphicon-info-sign" tooltipAnimation="true" tooltip="Number of cycles of Evaluation Period to force an alert is sent to endpoint. 0 if you don't want to force."></i>
             <div class="col-sm-9">
               <input type="number" formControlName="AlertNotify" id="AlertNotify" [ngModel]="sampleComponentForm.value.AlertNotify" min="0" />
               <control-messages [control]="sampleComponentForm.controls.AlertNotify"></control-messages>

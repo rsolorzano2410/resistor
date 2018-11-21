@@ -48,8 +48,10 @@ export class OperationComponent implements OnInit {
   private oldID : string;
 
   ngOnInit() {
+    console.log("zzz operation entering ngOnInit");
     this.editmode = 'list';
     this.reloadData();
+    console.log("zzz operation exiting ngOnInit");
   }
 
   constructor(public operationService: OperationService, public exportServiceCfg : ExportServiceCfg, builder: FormBuilder) {

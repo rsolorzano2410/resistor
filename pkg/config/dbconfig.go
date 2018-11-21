@@ -241,6 +241,8 @@ type AlertIDCfg struct {
 	NumAlertID  int    `xorm:"numalertid" binding:"Required"`
 	Description string `xorm:"description text"`
 	//Alert Origin data
+	IfxServer          string `xorm:"ifxserver"`
+	InfluxDBName       string `xorm:"influxdbname"`
 	InfluxDB           int64  `xorm:"influxdb" binding:"Required"`
 	InfluxRP           string `xorm:"influxrp" binding:"Required"`
 	InfluxMeasurement  string `xorm:"influxmeasurement" binding:"Required"`
@@ -310,6 +312,7 @@ type AlertIDCfgJSON struct {
 	ProductGroup string `json:"productgroup,omitempty"`
 	AlertGroup   string `json:"alertgroup"`
 	//Alert Origin data
+	IfxServer         string `json:"ifxserver"`
 	InfluxDBName      string `json:"influxdbname"`
 	InfluxRP          string `json:"influxrp"`
 	InfluxMeasurement string `json:"influxmeasurement"`

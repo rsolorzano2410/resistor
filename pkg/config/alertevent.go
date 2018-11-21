@@ -67,8 +67,8 @@ func (dbc *DatabaseCfg) GetAlertEventsByLevelArray(filter string) ([]*AlertEvent
 	return alevtsummarray, nil
 }
 
-/*GetAlertEventArrayWithParams generate an array of alert events with all its information */
-func (dbc *DatabaseCfg) GetAlertEventArrayWithParams(filter string, page int64, itemsPerPage int64, maxSize int64, sortColumn string, sortDir string) ([]*AlertEvent, error) {
+/*GetAlertEventArrayWithParams generate an array of alert events with all their information */
+func (dbc *DatabaseCfg) GetAlertEventArrayWithParams(filter string, page int64, itemsPerPage int64, maxSize int64, sortColumn string, sortDir string) ([]*AlertEvent, int64, error) {
 	log.Debugf("Getting AlertEvent data filtered with filter: %s, page: %d, itemsPerPage: %d, maxSize: %d, sortColumn: %s, sortDir: %s", filter, page, itemsPerPage, maxSize, sortColumn, sortDir)
 	var err error
 	var alevts []*AlertEvent
@@ -80,7 +80,20 @@ func (dbc *DatabaseCfg) GetAlertEventArrayWithParams(filter string, page int64, 
 		LIMIT itemsPerPage * maxSize
 		OFFSET itemsPerPage * (page - 1)
 	*/
-	sqlquery := "SELECT * FROM alert_event"
+
+	// Get total number of items
+	sqlquery := "SELECT count(*) FROM alert_event"
+	if len(filter) > 0 {
+		sqlquery = sqlquery + " WHERE " + filter
+	}
+	count, err := dbc.x.SQL(sqlquery).Count(&alevts)
+	if err != nil {
+		log.Warnf("Error getting total number of AlertEvents filtered with sqlquery: %s. Error : %s", sqlquery, err)
+		return nil, -1, err
+	}
+
+	// Get list of items
+	sqlquery = "SELECT * FROM alert_event"
 	if len(filter) > 0 {
 		sqlquery = sqlquery + " WHERE " + filter
 	}
@@ -103,9 +116,9 @@ func (dbc *DatabaseCfg) GetAlertEventArrayWithParams(filter string, page int64, 
 
 	if err = dbc.x.SQL(sqlquery).Find(&alevts); err != nil {
 		log.Warnf("Fail to get AlertEvent data filtered with sqlquery: %s. Error : %s", sqlquery, err)
-		return nil, err
+		return nil, -1, err
 	}
-	return alevts, nil
+	return alevts, count, nil
 }
 
 /*AddAlertEvent for adding new alert events*/

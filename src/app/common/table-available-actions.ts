@@ -60,6 +60,11 @@ export class AvailableTableActions {
         {'type' : 'selector', 'action' : 'ChangeProperty', 'options' : [
           {'title' : 'Active', 'type':'boolean', 'options' : [
             'true','false']
+          },
+          {'title': 'GrafanaServer', 'type':'input', 'options':
+            new FormGroup({
+              formControl : new FormControl('', Validators.required)
+            })
           }
         ]},
       }
